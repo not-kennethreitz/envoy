@@ -34,6 +34,7 @@ class Response(object):
         self.std_err = None
         self.std_out = None
         self.status_code = None
+        self.history = []
 
 
     def __repr__(self):
