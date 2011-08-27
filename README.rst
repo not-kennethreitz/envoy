@@ -1,9 +1,14 @@
-Envoy: Simplified Subprocesses
-===============================
-
-You probally don't need this. I do.
+Envoy: Simplified Subprocesses for Python
+==========================================
 
 **Note:** Work in progress.
+
+This is a convenience wrapper around the `subprocess` module.
+
+You likely don't need this.
+
+.. image:: http://cl.ly/2n1F3z0d3U2T0Z2E051E/Screen_Shot_2011-08-27_at_3.34.16_PM.png
+
 
 Usage
 -----
