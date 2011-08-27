@@ -3,7 +3,7 @@
 
 import os
 import sys
-import requests
+import envoy
 
 try:
     from setuptools import setup
@@ -24,7 +24,7 @@ required = []
 
 setup(
     name='envoy',
-    version=requests.__version__,
+    version=envoy.__version__,
     description='Simple API for running external processes.',
     long_description=open('README.rst').read(),
     author='Kenneth Reitz',

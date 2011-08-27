@@ -11,6 +11,9 @@ import subprocess
 import shlex
 
 
+__version__ = '0.0.0'
+
+
 class Response(object):
     """A command's response"""
 
