@@ -18,3 +18,7 @@ Usage
     'usage: git config [options]'
     >>> r.std_err
     ''
+
+Soon, you'll be able to pass in pipe strings too ::
+
+    >>> r = envoy.run('uptime | pbcopy')
