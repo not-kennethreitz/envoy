@@ -22,3 +22,11 @@ Usage
 Soon, you'll be able to pass in pipe strings too ::
 
     >>> r = envoy.run('uptime | pbcopy')
+
+    >>> r.command
+    'pbcopy'
+    >>> r.status_code
+    0
+
+    >>> r.history
+    [<Response 'uptime'>]
