@@ -51,28 +51,41 @@ def run(command, data=None, timeout=None, capture=True):
 
     # Prepare arguments.
     if isinstance(command, basestring):
-        command = shlex.split(command)
+        command = command.split('|')
+        command = map(shlex.split, command)
 
-    if capture:
-        do_capture=subprocess.PIPE
+    history = []
+
+    for i, c in enumerate(command):
+
+        if capture:
+            do_capture=subprocess.PIPE
+
+        if i:
+            data = history[-1].std_out
+
+        p = subprocess.Popen(c,
+            universal_newlines=True,
+            shell=False,
+            env=os.environ,
+            stdin=do_capture or None,
+            stdout=do_capture or None,
+            stderr=do_capture or None,
+        )
+
+        out, err = p.communicate(input=data)
+
+        r = Response(process=p)
+
+        r.command = c
+        r.std_out = out
+        r.std_err = err
+        r.status_code = p.returncode
+
+        history.append(r)
 
 
-    p = subprocess.Popen(command,
-        universal_newlines=True,
-        shell=False,
-        env=os.environ,
-        stdin=do_capture or None,
-        stdout=do_capture or None,
-        stderr=do_capture or None,
-    )
-
-    out, err = p.communicate(input=data)
-
-    r = Response(process=p)
-
-    r.command = command
-    r.std_out = out
-    r.std_err = err
-    r.status_code = p.returncode
+    r = history.pop()
+    r.history = history
 
     return r
