@@ -33,6 +33,7 @@ class Response(object):
         self.command = None
         self.std_err = None
         self.std_out = None
+        self.status_code = None
 
 
     def __repr__(self):
@@ -40,10 +41,6 @@ class Response(object):
             return '<Response [{0}]>'.format(self.command[0])
         else:
             return '<Response>'
-
-    @property
-    def status_code(self):
-        return self._process.returncode
 
 
 def run(command, data=None, timeout=None, capture=True):
@@ -62,7 +59,7 @@ def run(command, data=None, timeout=None, capture=True):
 
     p = subprocess.Popen(command,
         universal_newlines=True,
-        shell=True,
+        shell=False,
         env=os.environ,
         stdin=do_capture or None,
         stdout=do_capture or None,
@@ -71,11 +68,11 @@ def run(command, data=None, timeout=None, capture=True):
 
     out, err = p.communicate(input=data)
 
-    # print p.returncode
-
     r = Response(process=p)
+
     r.command = command
     r.std_out = out
     r.std_err = err
+    r.status_code = p.returncode
 
     return r
