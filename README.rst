@@ -5,9 +5,11 @@ Envoy: Simplified Subprocesses for Python
 
 This is a convenience wrapper around the `subprocess` module.
 
-You likely don't need this.
+You don't need this.
 
 .. image:: https://github.com/kennethreitz/envoy/raw/master/ext/in_action.png
+
+But you want it.
 
 
 Usage
