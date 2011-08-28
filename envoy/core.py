@@ -10,17 +10,12 @@ This module provides
 import os
 import shlex
 import subprocess
-import sys
-
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 
 __version__ = '0.0.0'
 __license__ = 'MIT'
 __author__ = 'Kenneth Reitz'
+
 
 
 class Response(object):
@@ -57,12 +52,12 @@ def run(command, data=None, timeout=None, capture=True):
 
     history = []
 
-    for i, c in enumerate(command):
+    for c in enumerate(command):
 
         if capture:
             do_capture=subprocess.PIPE
 
-        if i:
+        if len(history):
             data = history[-1].std_out
 
         p = subprocess.Popen(c,
