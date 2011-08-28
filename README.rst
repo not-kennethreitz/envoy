@@ -1,5 +1,5 @@
-Envoy: Simplified Subprocesses for Python
-==========================================
+Envoy: Python Subprocesses for Humans.
+======================================
 
 **Note:** Work in progress.
 
