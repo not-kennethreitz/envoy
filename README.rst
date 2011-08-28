@@ -15,7 +15,7 @@ But you want it.
 Usage
 -----
 
-::
+Run a command, get the response::
 
     >>> r = envoy.run('git config', data='data to pipe in', timeout=2)
 
@@ -26,7 +26,7 @@ Usage
     >>> r.std_err
     ''
 
-Soon, you'll be able to pass in pipe strings too ::
+Pipe stuff around too::
 
     >>> r = envoy.run('uptime | pbcopy')
 
