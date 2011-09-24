@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """Pexpect is a Python module for spawning child applications and controlling
 them automatically. Pexpect can be used for automating interactive applications
 such as ssh, ftp, passwd, telnet, etc. It can be used to a automate setup
@@ -104,7 +106,6 @@ class ExceptionPexpect(Exception):
         return str(self.value)
 
     def get_trace(self):
-
         """This returns an abbreviated stack trace with lines that only concern
         the caller. In other words, the stack trace inside the Pexpect module
         is not included. """
@@ -116,7 +117,6 @@ class ExceptionPexpect(Exception):
         return ''.join(tblist)
 
     def __filter_not_pexpect(self, trace_list_item):
-
         """This returns True if list item 0 the string 'pexpect.py' in it. """
 
         if trace_list_item[0].find('pexpect.py') == -1:
@@ -125,11 +125,9 @@ class ExceptionPexpect(Exception):
             return False
 
 class EOF(ExceptionPexpect):
-
     """Raised when EOF is read from a child. This usually means the child has exited."""
 
 class TIMEOUT(ExceptionPexpect):
-
     """Raised when a read time exceeds the timeout. """
 
 ##class TIMEOUT_PATTERN(TIMEOUT):
@@ -142,7 +140,6 @@ class TIMEOUT(ExceptionPexpect):
 ##    """Raised when a scan buffer fills before matching an expected pattern."""
 
 def run (command, timeout=-1, withexitstatus=False, events=None, extra_args=None, logfile=None, cwd=None, env=None):
-
     """
     This function runs the given command; waits for it to finish; then
     returns all output as a string. STDERR is included in output. If the full
@@ -246,10 +243,10 @@ def run (command, timeout=-1, withexitstatus=False, events=None, extra_args=None
             else:
                 raise TypeError ('The callback must be a string or function type.')
             event_count = event_count + 1
-        except TIMEOUT, e:
+        except TIMEOUT:
             child_result_list.append(child.before)
             break
-        except EOF, e:
+        except EOF:
             child_result_list.append(child.before)
             break
     child_result = ''.join(child_result_list)
@@ -336,12 +333,12 @@ class spawn (object):
         the input from the child and output sent to the child. Sometimes you
         don't want to see everything you write to the child. You only want to
         log what the child sends back. For example::
-        
+
             child = pexpect.spawn('some_command')
             child.logfile_read = sys.stdout
 
         To separately log output sent to the child use logfile_send::
-        
+
             self.logfile_send = fout
 
         The delaybeforesend helps overcome a weird behavior that many users
@@ -429,7 +426,6 @@ class spawn (object):
             self._spawn (command, args)
 
     def __del__(self):
-
         """This makes sure that no system resources are left open. Python only
         garbage collects Python objects. OS file descriptors are not Python
         objects, so they must be handled explicitly. If the child file
@@ -447,7 +443,6 @@ class spawn (object):
                 pass
 
     def __str__(self):
-
         """This returns a human-readable string that represents the state of
         the object. """
 
@@ -481,7 +476,6 @@ class spawn (object):
         return '\n'.join(s)
 
     def _spawn(self,command,args=[]):
-
         """This starts the given command in a child process. This does all the
         fork/exec type of stuff for a pty. This is called by __init__. If args
         is empty then command will be parsed (split on spaces) and args will be
@@ -565,7 +559,6 @@ class spawn (object):
         self.closed = False
 
     def __fork_pty(self):
-
         """This implements a substitute for the forkpty system call. This
         should be more portable than the pty.fork() function. Specifically,
         this should work on Solaris.
@@ -604,7 +597,6 @@ class spawn (object):
         return pid, parent_fd
 
     def __pty_make_controlling_tty(self, tty_fd):
-
         """This makes the pseudo-terminal the controlling tty. This should be
         more portable than the pty.fork() function. Specifically, this should
         work on Solaris. """
@@ -643,14 +635,12 @@ class spawn (object):
             os.close(fd)
 
     def fileno (self):   # File-like object.
-
         """This returns the file descriptor of the pty for the child.
         """
 
         return self.child_fd
 
     def close (self, force=True):   # File-like object.
-
         """This closes the connection with the child application. Note that
         calling close() more than once is valid. This emulates standard Python
         behavior with files. Set force to True if you want to make sure that
@@ -669,21 +659,18 @@ class spawn (object):
             #self.pid = None
 
     def flush (self):   # File-like object.
-
         """This does nothing. It is here to support the interface for a
         File-like object. """
 
         pass
 
     def isatty (self):   # File-like object.
-
         """This returns True if the file descriptor is open and connected to a
         tty(-like) device, else False. """
 
         return os.isatty(self.child_fd)
 
     def waitnoecho (self, timeout=-1):
-
         """This waits until the terminal ECHO flag is set False. This returns
         True if the echo mode is off. This returns False if the ECHO flag was
         not set False before the timeout. This can be used to detect when the
@@ -704,7 +691,7 @@ class spawn (object):
         if timeout == -1:
             timeout = self.timeout
         if timeout is not None:
-            end_time = time.time() + timeout 
+            end_time = time.time() + timeout
         while True:
             if not self.getecho():
                 return True
@@ -715,7 +702,6 @@ class spawn (object):
             time.sleep(0.1)
 
     def getecho (self):
-
         """This returns the terminal echo mode. This returns True if echo is
         on or False if echo is off. Child applications that are expecting you
         to enter a password often set ECHO False. See waitnoecho(). """
@@ -726,7 +712,6 @@ class spawn (object):
         return False
 
     def setecho (self, state):
-
         """This sets the terminal echo mode on or off. Note that anything the
         child sent before the echo will be lost, so you should be sure that
         your input buffer is empty before you call setecho(). For example, the
@@ -767,7 +752,6 @@ class spawn (object):
         termios.tcsetattr(self.child_fd, termios.TCSANOW, attr)
 
     def read_nonblocking (self, size = 1, timeout = -1):
-
         """This reads at most size characters from the child application. It
         includes a timeout. If the read does not complete within the timeout
         period then a TIMEOUT exception is raised. If the end of file is read
@@ -826,7 +810,7 @@ class spawn (object):
         if self.child_fd in r:
             try:
                 s = os.read(self.child_fd, size)
-            except OSError, e: # Linux does this
+            except OSError: # Linux does this
                 self.flag_eof = True
                 raise EOF ('End Of File (EOF) in read_nonblocking(). Exception style platform.')
             if s == '': # BSD style
@@ -845,7 +829,6 @@ class spawn (object):
         raise ExceptionPexpect ('Reached an unexpected state in read_nonblocking().')
 
     def read (self, size = -1):   # File-like object.
-
         """This reads at most "size" bytes from the file (less if the read hits
         EOF before obtaining size bytes). If the size argument is negative or
         omitted, read all data until EOF is reached. The bytes are returned as
@@ -872,7 +855,6 @@ class spawn (object):
         return self.before
 
     def readline (self, size = -1):    # File-like object.
-
         """This reads and returns one entire line. A trailing newline is kept
         in the string, but may be absent when a file ends with an incomplete
         line. Note: This readline() looks for a \\r\\n pair even on UNIX
@@ -891,14 +873,12 @@ class spawn (object):
             return self.before
 
     def __iter__ (self):    # File-like object.
-
         """This is to support iterators over a file-like object.
         """
 
         return self
 
     def next (self):    # File-like object.
-
         """This is to support iterators over a file-like object.
         """
 
@@ -908,7 +888,6 @@ class spawn (object):
         return result
 
     def readlines (self, sizehint = -1):    # File-like object.
-
         """This reads until EOF using readline() and returns a list containing
         the lines thus read. The optional "sizehint" argument is ignored. """
 
@@ -921,14 +900,12 @@ class spawn (object):
         return lines
 
     def write(self, s):   # File-like object.
-
         """This is similar to send() except that there is no return value.
         """
 
         self.send (s)
 
     def writelines (self, sequence):   # File-like object.
-
         """This calls write() for each element in the sequence. The sequence
         can be any iterable object producing strings, typically a list of
         strings. This does not add line separators There is no return value.
@@ -938,7 +915,6 @@ class spawn (object):
             self.write (s)
 
     def send(self, s):
-
         """This sends a string to the child process. This returns the number of
         bytes written. If a log file was set then the data is also written to
         the log. """
@@ -954,7 +930,6 @@ class spawn (object):
         return c
 
     def sendline(self, s=''):
-
         """This is like send(), but it adds a line feed (os.linesep). This
         returns the number of bytes written. """
 
@@ -963,7 +938,6 @@ class spawn (object):
         return n
 
     def sendcontrol(self, char):
-
         """This sends a control character to the child such as Ctrl-C or
         Ctrl-D. For example, to send a Ctrl-G (ASCII 7)::
 
@@ -989,7 +963,6 @@ class spawn (object):
         return self.send (chr(d[char]))
 
     def sendeof(self):
-
         """This sends an EOF to the child. This sends a character which causes
         the pending parent output buffer to be sent to the waiting child
         program without waiting for end-of-line. If it is the first character
@@ -1023,7 +996,6 @@ class spawn (object):
         self.send(char)
 
     def sendintr(self):
-
         """This sends a SIGINT to the child. It does not require
         the SIGINT to be the first character on a line. """
 
@@ -1034,15 +1006,13 @@ class spawn (object):
             char = chr(3)
         self.send (char)
 
-    def eof (self):
-
+    def eof(self):
         """This returns True if the EOF exception was ever raised.
         """
 
         return self.flag_eof
 
     def terminate(self, force=False):
-
         """This forces a child process to terminate. It starts nicely with
         SIGHUP and SIGINT. If "force" is True then moves onto SIGKILL. This
         returns True if the child was terminated. This returns False if the
@@ -1071,7 +1041,7 @@ class spawn (object):
                 else:
                     return False
             return False
-        except OSError, e:
+        except OSError:
             # I think there are kernel timing issues that sometimes cause
             # this to happen. I think isalive() reports True, but the
             # process is dead to the kernel.
@@ -1083,7 +1053,6 @@ class spawn (object):
                 return False
 
     def wait(self):
-
         """This waits until the child exits. This is a blocking call. This will
         not read any data from the child, so this will block forever if the
         child has unread output and has terminated. In other words, the child
@@ -1110,7 +1079,6 @@ class spawn (object):
         return self.exitstatus
 
     def isalive(self):
-
         """This tests if the child process is running or not. This is
         non-blocking. If the child was terminated then this will read the
         exitstatus or signalstatus of the child. This returns True if the child
@@ -1173,7 +1141,6 @@ class spawn (object):
         return False
 
     def kill(self, sig):
-
         """This sends the given signal to the child application. In keeping
         with UNIX tradition it has a misleading name. It does not necessarily
         kill the child unless you send the right signal. """
@@ -1183,7 +1150,6 @@ class spawn (object):
             os.kill(self.pid, sig)
 
     def compile_pattern_list(self, patterns):
-
         """This compiles a pattern-string or a list of pattern-strings.
         Patterns must be a StringType, EOF, TIMEOUT, SRE_Pattern, or a list of
         those. Patterns may also be None which results in an empty list (you
@@ -1231,7 +1197,6 @@ class spawn (object):
         return compiled_pattern_list
 
     def expect(self, pattern, timeout = -1, searchwindowsize=None):
-
         """This seeks through the stream until a pattern is matched. The
         pattern is overloaded and may take several types. The pattern can be a
         StringType, EOF, a compiled re, or a list of any of those types.
@@ -1311,7 +1276,6 @@ class spawn (object):
         return self.expect_list(compiled_pattern_list, timeout, searchwindowsize)
 
     def expect_list(self, pattern_list, timeout = -1, searchwindowsize = -1):
-
         """This takes a list of compiled regular expressions and returns the
         index into the pattern_list that matched the child output. The list may
         also contain EOF or TIMEOUT (which are not compiled regular
@@ -1325,7 +1289,6 @@ class spawn (object):
         return self.expect_loop(searcher_re(pattern_list), timeout, searchwindowsize)
 
     def expect_exact(self, pattern_list, timeout = -1, searchwindowsize = -1):
-
         """This is similar to expect(), but uses plain string matching instead
         of compiled regular expressions in 'pattern_list'. The 'pattern_list'
         may be a string; a list or other sequence of strings; or TIMEOUT and
@@ -1343,7 +1306,6 @@ class spawn (object):
         return self.expect_loop(searcher_string(pattern_list), timeout, searchwindowsize)
 
     def expect_loop(self, searcher, timeout = -1, searchwindowsize = -1):
-
         """This is the common loop used inside expect. The 'searcher' should be
         an instance of searcher_re or searcher_string, which describes how and what
         to search for in the input.
@@ -1355,7 +1317,7 @@ class spawn (object):
         if timeout == -1:
             timeout = self.timeout
         if timeout is not None:
-            end_time = time.time() + timeout 
+            end_time = time.time() + timeout
         if searchwindowsize == -1:
             searchwindowsize = self.searchwindowsize
 
@@ -1415,7 +1377,6 @@ class spawn (object):
             raise
 
     def getwinsize(self):
-
         """This returns the terminal window size of the child tty. The return
         value is a tuple of (rows, cols). """
 
@@ -1425,7 +1386,6 @@ class spawn (object):
         return struct.unpack('HHHH', x)[0:2]
 
     def setwinsize(self, r, c):
-
         """This sets the terminal window size of the child tty. This will cause
         a SIGWINCH signal to be sent to the child. This does not change the
         physical window size. It changes the size reported to TTY-aware
@@ -1448,7 +1408,6 @@ class spawn (object):
         fcntl.ioctl(self.fileno(), TIOCSWINSZ, s)
 
     def interact(self, escape_character = chr(29), input_filter = None, output_filter = None):
-
         """This gives control of the child process to the interactive user (the
         human at the keyboard). Keystrokes are sent to the child process, and
         the stdout and stderr output of the child process is printed. This
@@ -1494,7 +1453,6 @@ class spawn (object):
             tty.tcsetattr(self.STDIN_FILENO, tty.TCSAFLUSH, mode)
 
     def __interact_writen(self, fd, data):
-
         """This is used by the interact() method.
         """
 
@@ -1503,14 +1461,12 @@ class spawn (object):
             data = data[n:]
 
     def __interact_read(self, fd):
-
         """This is used by the interact() method.
         """
 
         return os.read(fd, 1000)
 
     def __interact_copy(self, escape_character = None, input_filter = None, output_filter = None):
-
         """This is used by the interact() method.
         """
 
@@ -1534,7 +1490,6 @@ class spawn (object):
                 self.__interact_writen(self.child_fd, data)
 
     def __select (self, iwtd, owtd, ewtd, timeout=None):
-
         """This is a wrapper around select.select() that ignores signals. If
         select.select raises a select.error exception and errno is an EINTR
         error then it is ignored. Mainly this is used to ignore sigwinch
@@ -1561,14 +1516,12 @@ class spawn (object):
 # The following methods are no longer supported or allowed.
 
     def setmaxread (self, maxread):
-
         """This method is no longer supported or allowed. I don't like getters
         and setters without a good reason. """
 
         raise ExceptionPexpect ('This method is no longer supported or allowed. Just assign a value to the maxread member variable.')
 
     def setlog (self, fileobject):
-
         """This method is no longer supported or allowed.
         """
 
@@ -1579,7 +1532,6 @@ class spawn (object):
 ##############################################################################
 
 class searcher_string (object):
-
     """This is a plain string search helper for the spawn.expect_any() method.
 
     Attributes:
@@ -1596,7 +1548,6 @@ class searcher_string (object):
     """
 
     def __init__(self, strings):
-
         """This creates an instance of searcher_string. This argument 'strings'
         may be a list; a sequence of strings; or the EOF or TIMEOUT types. """
 
@@ -1613,7 +1564,6 @@ class searcher_string (object):
             self._strings.append((n, s))
 
     def __str__(self):
-
         """This returns a human-readable string that represents the state of
         the object."""
 
@@ -1628,7 +1578,6 @@ class searcher_string (object):
         return '\n'.join(ss)
 
     def search(self, buffer, freshlen, searchwindowsize=None):
-
         """This searches 'buffer' for the first occurence of one of the search
         strings.  'freshlen' must indicate the number of bytes at the end of
         'buffer' which have not been searched before. It helps to avoid
@@ -1653,7 +1602,7 @@ class searcher_string (object):
         # rescanning until we've read three more bytes.
         #
         # Sadly, I don't know enough about this interesting topic. /grahn
-        
+
         for index, s in self._strings:
             if searchwindowsize is None:
                 # the match, if any, can only be in the fresh data,
@@ -1674,7 +1623,6 @@ class searcher_string (object):
         return best_index
 
 class searcher_re (object):
-
     """This is regular expression string search helper for the
     spawn.expect_any() method.
 
@@ -1693,7 +1641,6 @@ class searcher_re (object):
     """
 
     def __init__(self, patterns):
-
         """This creates an instance that searches for 'patterns' Where
         'patterns' may be a list or other sequence of compiled regular
         expressions, or the EOF or TIMEOUT types."""
@@ -1711,7 +1658,6 @@ class searcher_re (object):
             self._searches.append((n, s))
 
     def __str__(self):
-
         """This returns a human-readable string that represents the state of
         the object."""
 
@@ -1726,13 +1672,12 @@ class searcher_re (object):
         return '\n'.join(ss)
 
     def search(self, buffer, freshlen, searchwindowsize=None):
-
         """This searches 'buffer' for the first occurence of one of the regular
         expressions. 'freshlen' must indicate the number of bytes at the end of
         'buffer' which have not been searched before.
 
         See class spawn for the 'searchwindowsize' argument.
-        
+
         If there is a match this returns the index of that string, and sets
         'start', 'end' and 'match'. Otherwise, returns -1."""
 
@@ -1760,8 +1705,7 @@ class searcher_re (object):
         self.end = self.match.end()
         return best_index
 
-def which (filename):
-
+def which(filename):
     """This takes a given filename; tries to find it in the environment path;
     then checks if it is executable. This returns the full path to the filename
     if found and executable. Otherwise this returns None."""
@@ -1788,7 +1732,6 @@ def which (filename):
     return None
 
 def split_command_line(command_line):
-
     """This splits a command line into a list of arguments. It splits arguments
     on spaces, but handles embedded quotes, doublequotes, and escaped
     characters. It's impossible to do this with a regular expression, so I
