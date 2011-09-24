@@ -74,12 +74,8 @@ class Response(object):
         else:
             return '<Response>'
 
-
-def run(command, data=None, timeout=None):
-    """Executes a given commmand and returns Response.
-
-    Blocks until process is complete, or timeout is reached.
-    """
+def prep_args(command):
+    """Parses command strings and returns a Popen-ready list."""
 
     # Prepare arguments.
     if isinstance(command, basestring):
@@ -95,14 +91,24 @@ def run(command, data=None, timeout=None):
                 break
 
         command = map(shlex.split, command)
-    
+
+    return command
+
+
+def run(command, data=None, timeout=None):
+    """Executes a given commmand and returns Response.
+
+    Blocks until process is complete, or timeout is reached.
+    """
+
+    command = prep_args(command)
+
     history = []
     for c in command:
 
         if len(history):
             # due to broken pipe problems pass only first 10MB
             data = history[-1].std_out[0:10*1024]
-        
 
         cmd = Command(c)
         out, err = cmd.run(data, timeout)
@@ -113,7 +119,7 @@ def run(command, data=None, timeout=None):
         r.std_out = out
         r.std_err = err
         r.status_code = cmd.returncode
-        
+
 
         history.append(r)
 
