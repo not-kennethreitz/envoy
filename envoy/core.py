@@ -65,47 +65,6 @@ class ConnectedCommand(object):
         self.std_out = std_out
         self.std_err = std_out
 
-    @property
-    def status_code(self):
-        """The status code of the process.
-
-        If the code is None, assume that it's still running.
-        """
-        return None
-
-    @property
-    def pid(self):
-        """The process' PID."""
-        return 0
-
-    def kill(self):
-        """Kills the process."""
-        return True
-
-    def expect(self, bytes, stream=None):
-        """Block until given bytes appear in the stream."""
-        if stream is None:
-            stream = self.std_out
-        pass
-
-    def sendline(self, end='\n'):
-        """Sends a line to std_in."""
-        pass
-
-    def block(self):
-        """Blocks until command finishes. Returns Response instance."""
-        pass
-
-
-
-
-        self._process = process
-
-        self._status_code = process.returncode
-        self.std_in = process.stdin
-        self.std_out = process.stdout
-        self.std_err = process.stderr
-
     def __enter__(self):
         return self
 
