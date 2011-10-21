@@ -4,13 +4,14 @@
 envoy.core
 ~~~~~~~~~~
 
-This module provides
+This module provides envoy awesomeness.
 """
 
 import os
 import shlex
 import subprocess
 import threading
+
 
 __version__ = '0.0.2'
 __license__ = 'MIT'
@@ -73,12 +74,12 @@ class ConnectedCommand(object):
 
     @property
     def status_code(self):
-        """
-        The status code of the process.
+        """The status code of the process.
         If the code is None, assume that it's still running.
         """
         if self._status_code is not None:
             return self._status_code
+
         # investigate
         return None
 
@@ -99,6 +100,7 @@ class ConnectedCommand(object):
 
     def send(self, end='\n'):
         """Sends a line to std_in."""
+        #TODO: Y U LINE BUFFER
         pass
 
     def block(self):
@@ -127,6 +129,7 @@ class Response(object):
         else:
             return '<Response>'
 
+
 def expand_args(command):
     """Parses command strings and returns a Popen-ready list."""
 
@@ -136,6 +139,7 @@ def expand_args(command):
         splitter.whitespace = '|'
         splitter.whitespace_split = True
         command = []
+
         while True:
             token = splitter.get_token()
             if token:
@@ -179,18 +183,13 @@ def run(command, data=None, timeout=None):
     r.history = history
 
     return r
-def connect():
-    pass
+
+
 def connect(command, data=None):
-    """Spawns a new process from the given command.
-    """
+    """Spawns a new process from the given command."""
 
     # TODO: support piped commands
     command_str = expand_args(command).pop()
-
-    # cmd = ConnectedCommand()
-
-    # def target():
 
     process = subprocess.Popen(command_str,
         universal_newlines=True,
@@ -202,13 +201,4 @@ def connect(command, data=None):
         bufsize=0,
     )
 
-    c = ConnectedCommand(process=process)
-    return c
-        # out, err = process.communicate(data)
-
-    # thread = threading.Thread(target=target)
-    # thread.start()
-
-    # self.returncode = self.process.returncode
-
-    return cmd
+    return ConnectedCommand(process=process)
