@@ -1,2 +1,3 @@
 include AUTHORS
 include README.rst
+include test_envoy.py
