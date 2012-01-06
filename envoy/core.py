@@ -27,14 +27,16 @@ class Command(object):
         self.returncode = None
         self.data = None
 
-    def run(self, data, timeout):
+    def run(self, data, timeout, env):
         self.data = data
+        environ = dict(os.environ).update(env or {})
+
         def target():
 
             self.process = subprocess.Popen(self.cmd,
                 universal_newlines=True,
                 shell=False,
-                env=os.environ,
+                env=environ,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -152,7 +154,7 @@ def expand_args(command):
     return command
 
 
-def run(command, data=None, timeout=None):
+def run(command, data=None, timeout=None, env=None):
     """Executes a given commmand and returns Response.
 
     Blocks until process is complete, or timeout is reached.
@@ -168,7 +170,7 @@ def run(command, data=None, timeout=None):
             data = history[-1].std_out[0:10*1024]
 
         cmd = Command(c)
-        out, err = cmd.run(data, timeout)
+        out, err = cmd.run(data, timeout, env)
 
         r = Response(process=cmd)
 
@@ -185,16 +187,17 @@ def run(command, data=None, timeout=None):
     return r
 
 
-def connect(command, data=None):
+def connect(command, data=None, env=None):
     """Spawns a new process from the given command."""
 
     # TODO: support piped commands
     command_str = expand_args(command).pop()
+    environ = dict(os.environ).update(env or {})
 
     process = subprocess.Popen(command_str,
         universal_newlines=True,
         shell=False,
-        env=os.environ,
+        env=environ,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
