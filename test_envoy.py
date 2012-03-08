@@ -22,6 +22,7 @@ class SimpleTest(unittest.TestCase):
         sentinel = 'quoted_args' * 3
         r = envoy.run("python -c 'print \"%s\"'" % sentinel)
         self.assertEqual(r.std_out.rstrip(), sentinel)
+        self.assertEqual(r.status_code, 0)
 
 if __name__ == "__main__":
     unittest.main()
