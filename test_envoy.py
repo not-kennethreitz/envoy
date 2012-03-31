@@ -18,5 +18,11 @@ class SimpleTest(unittest.TestCase):
         self.assertEqual(r.std_out, 'y\ny\ny\ny\ny\ny\ny\ny\ny\ny\n')
         self.assertEqual(r.status_code, 0)
 
+    def test_quoted_args(self):
+        sentinel = 'quoted_args' * 3
+        r = envoy.run("python -c 'print \"%s\"'" % sentinel)
+        self.assertEqual(r.std_out.rstrip(), sentinel)
+        self.assertEqual(r.status_code, 0)
+
 if __name__ == "__main__":
     unittest.main()
