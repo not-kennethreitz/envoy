@@ -100,10 +100,9 @@ class ConnectedCommand(object):
             stream = self.std_out
         pass
 
-    def send(self, end='\n'):
+    def send(self, str, end='\n'):
         """Sends a line to std_in."""
-        #TODO: Y U LINE BUFFER
-        pass
+        return self._process.stdin.write(str+end)
 
     def block(self):
         """Blocks until command finishes. Returns Response instance."""
