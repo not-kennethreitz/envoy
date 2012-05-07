@@ -27,7 +27,7 @@ class Command(object):
         self.returncode = None
         self.data = None
 
-    def run(self, data, timeout, env):
+    def run(self, data, timeout, kill_timeout, env):
         self.data = data
         environ = dict(os.environ).update(env or {})
 
@@ -51,7 +51,10 @@ class Command(object):
         thread.join(timeout)
         if thread.is_alive():
             self.process.terminate()
-            thread.join()
+            thread.join(kill_timeout)
+            if thread.is_alive():
+                self.process.kill()
+                thread.join()
         self.returncode = self.process.returncode
         return self.out, self.err
 
@@ -153,7 +156,7 @@ def expand_args(command):
     return command
 
 
-def run(command, data=None, timeout=None, env=None):
+def run(command, data=None, timeout=None, kill_timeout=None, env=None):
     """Executes a given commmand and returns Response.
 
     Blocks until process is complete, or timeout is reached.
@@ -169,7 +172,7 @@ def run(command, data=None, timeout=None, env=None):
             data = history[-1].std_out[0:10*1024]
 
         cmd = Command(c)
-        out, err = cmd.run(data, timeout, env)
+        out, err = cmd.run(data, timeout, kill_timeout, env)
 
         r = Response(process=cmd)
 
