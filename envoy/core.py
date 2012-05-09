@@ -29,7 +29,8 @@ class Command(object):
 
     def run(self, data, timeout, kill_timeout, env):
         self.data = data
-        environ = dict(os.environ).update(env or {})
+        environ = dict(os.environ)
+        environ.update(env or {})
 
         def target():
 
@@ -194,7 +195,8 @@ def connect(command, data=None, env=None):
 
     # TODO: support piped commands
     command_str = expand_args(command).pop()
-    environ = dict(os.environ).update(env or {})
+    environ = dict(os.environ)
+    environ.update(env or {})
 
     process = subprocess.Popen(command_str,
         universal_newlines=True,
