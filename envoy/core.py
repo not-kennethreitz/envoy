@@ -8,6 +8,7 @@ This module provides envoy awesomeness.
 """
 
 import os
+import sys
 import shlex
 import subprocess
 import threading
@@ -43,8 +44,13 @@ class Command(object):
                 stderr=subprocess.PIPE,
                 bufsize=0,
             )
-
-            self.out, self.err = self.process.communicate(self.data)
+            if sys.version_info[0] >= 3:
+                self.out, self.err = self.process.communicate(
+                    input = bytes(self.data, "UTF-8") if self.data else None 
+                )
+            else:
+                self.out, self.err = self.process.communicate(self.data)
+              
 
         thread = threading.Thread(target=target)
         thread.start()
@@ -139,7 +145,7 @@ def expand_args(command):
     """Parses command strings and returns a Popen-ready list."""
 
     # Prepare arguments.
-    if isinstance(command, basestring):
+    if isinstance(command, str):
         splitter = shlex.shlex(command)
         splitter.whitespace = '|'
         splitter.whitespace_split = True
@@ -152,7 +158,7 @@ def expand_args(command):
             else:
                 break
 
-        command = map(shlex.split, command)
+        command = list(map(shlex.split, command))
 
     return command
 
