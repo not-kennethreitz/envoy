@@ -24,5 +24,11 @@ class SimpleTest(unittest.TestCase):
         self.assertEqual(r.std_out.rstrip(), sentinel)
         self.assertEqual(r.status_code, 0)
 
+class ConnectedCommandTests(unittest.TestCase):
+
+    def test_status_code(self):
+        c = envoy.connect("sleep 5")
+        self.assertEqual(c.status_code, None)
+
 if __name__ == "__main__":
     unittest.main()

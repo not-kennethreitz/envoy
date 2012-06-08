@@ -71,6 +71,7 @@ class ConnectedCommand(object):
         self.std_in = std_in
         self.std_out = std_out
         self.std_err = std_out
+        self._status_code = None
 
     def __enter__(self):
         return self
@@ -83,11 +84,7 @@ class ConnectedCommand(object):
         """The status code of the process.
         If the code is None, assume that it's still running.
         """
-        if self._status_code is not None:
-            return self._status_code
-
-        # investigate
-        return None
+        return self._status_code
 
     @property
     def pid(self):
