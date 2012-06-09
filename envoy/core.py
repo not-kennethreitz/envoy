@@ -8,7 +8,9 @@ This module provides envoy awesomeness.
 """
 
 import os
+import sys
 import shlex
+import signal
 import subprocess
 import threading
 
@@ -17,6 +19,28 @@ __version__ = '0.0.2'
 __license__ = 'MIT'
 __author__ = 'Kenneth Reitz'
 
+
+def _terminate_process(process):
+    if sys.platform == 'win32':
+        import ctypes
+        PROCESS_TERMINATE = 1
+        handle = ctypes.windll.kernel32.OpenProcess(PROCESS_TERMINATE, False, process.pid)
+        ctypes.windll.kernel32.TerminateProcess(handle, -1)
+        ctypes.windll.kernel32.CloseHandle(handle)
+    else:
+        os.kill(process.pid, signal.SIGTERM)
+
+def _kill_process(process):
+   if sys.platform == 'win32':
+       _terminate_process(process)
+   else:
+       os.kill(process.pid, signal.SIGKILL)
+
+def _is_alive(thread):
+    if hasattr(thread, "is_alive"):
+        return thread.is_alive()
+    else:
+        return thread.isAlive()
 
 class Command(object):
     def __init__(self, cmd):
@@ -43,18 +67,23 @@ class Command(object):
                 stderr=subprocess.PIPE,
                 bufsize=0,
             )
-
-            self.out, self.err = self.process.communicate(self.data)
+            if sys.version_info[0] >= 3:
+                self.out, self.err = self.process.communicate(
+                    input = bytes(self.data, "UTF-8") if self.data else None 
+                )
+            else:
+                self.out, self.err = self.process.communicate(self.data)
+              
 
         thread = threading.Thread(target=target)
         thread.start()
 
         thread.join(timeout)
-        if thread.is_alive():
-            self.process.terminate()
+        if _is_alive(thread) :
+            _terminate_process(self.process)
             thread.join(kill_timeout)
-            if thread.is_alive():
-                self.process.kill()
+            if _is_alive(thread):
+                _kill_process(self.process)
                 thread.join()
         self.returncode = self.process.returncode
         return self.out, self.err
@@ -139,7 +168,7 @@ def expand_args(command):
     """Parses command strings and returns a Popen-ready list."""
 
     # Prepare arguments.
-    if isinstance(command, basestring):
+    if isinstance(command, str):
         splitter = shlex.shlex(command)
         splitter.whitespace = '|'
         splitter.whitespace_split = True
@@ -152,7 +181,7 @@ def expand_args(command):
             else:
                 break
 
-        command = map(shlex.split, command)
+        command = list(map(shlex.split, command))
 
     return command
 
