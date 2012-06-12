@@ -129,7 +129,6 @@ class ConnectedCommand(object):
         """Block until given bytes appear in the stream."""
         if stream is None:
             stream = self.std_out
-        pass
 
     def send(self, str, end='\n'):
         """Sends a line to std_in."""
