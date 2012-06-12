@@ -50,6 +50,7 @@ class Command(object):
         self.err = None
         self.returncode = None
         self.data = None
+        self.exc = None
 
     def run(self, data, timeout, kill_timeout, env, cwd):
         self.data = data
@@ -58,28 +59,34 @@ class Command(object):
 
         def target():
 
-            self.process = subprocess.Popen(self.cmd,
-                universal_newlines=True,
-                shell=False,
-                env=environ,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                bufsize=0,
-                cwd=cwd,
-            )
-            if sys.version_info[0] >= 3:
-                self.out, self.err = self.process.communicate(
-                    input = bytes(self.data, "UTF-8") if self.data else None 
+            try:
+                self.process = subprocess.Popen(self.cmd,
+                    universal_newlines=True,
+                    shell=False,
+                    env=environ,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    bufsize=0,
+                    cwd=cwd,
                 )
-            else:
-                self.out, self.err = self.process.communicate(self.data)
+
+                if sys.version_info[0] >= 3:
+                    self.out, self.err = self.process.communicate(
+                        input = bytes(self.data, "UTF-8") if self.data else None 
+                    )
+                else:
+                    self.out, self.err = self.process.communicate(self.data)
+            except Exception as exc:
+                self.exc = exc
               
 
         thread = threading.Thread(target=target)
         thread.start()
 
         thread.join(timeout)
+        if self.exc:
+            raise self.exc
         if _is_alive(thread) :
             _terminate_process(self.process)
             thread.join(kill_timeout)
