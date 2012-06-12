@@ -50,35 +50,43 @@ class Command(object):
         self.err = None
         self.returncode = None
         self.data = None
+        self.exc = None
 
-    def run(self, data, timeout, kill_timeout, env):
+    def run(self, data, timeout, kill_timeout, env, cwd):
         self.data = data
         environ = dict(os.environ)
         environ.update(env or {})
 
         def target():
 
-            self.process = subprocess.Popen(self.cmd,
-                universal_newlines=True,
-                shell=False,
-                env=environ,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                bufsize=0,
-            )
-            if sys.version_info[0] >= 3:
-                self.out, self.err = self.process.communicate(
-                    input = bytes(self.data, "UTF-8") if self.data else None 
+            try:
+                self.process = subprocess.Popen(self.cmd,
+                    universal_newlines=True,
+                    shell=False,
+                    env=environ,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    bufsize=0,
+                    cwd=cwd,
                 )
-            else:
-                self.out, self.err = self.process.communicate(self.data)
+
+                if sys.version_info[0] >= 3:
+                    self.out, self.err = self.process.communicate(
+                        input = bytes(self.data, "UTF-8") if self.data else None 
+                    )
+                else:
+                    self.out, self.err = self.process.communicate(self.data)
+            except Exception as exc:
+                self.exc = exc
               
 
         thread = threading.Thread(target=target)
         thread.start()
 
         thread.join(timeout)
+        if self.exc:
+            raise self.exc
         if _is_alive(thread) :
             _terminate_process(self.process)
             thread.join(kill_timeout)
@@ -128,7 +136,6 @@ class ConnectedCommand(object):
         """Block until given bytes appear in the stream."""
         if stream is None:
             stream = self.std_out
-        pass
 
     def send(self, str, end='\n'):
         """Sends a line to std_in."""
@@ -183,7 +190,7 @@ def expand_args(command):
     return command
 
 
-def run(command, data=None, timeout=None, kill_timeout=None, env=None):
+def run(command, data=None, timeout=None, kill_timeout=None, env=None, cwd=None):
     """Executes a given commmand and returns Response.
 
     Blocks until process is complete, or timeout is reached.
@@ -199,7 +206,7 @@ def run(command, data=None, timeout=None, kill_timeout=None, env=None):
             data = history[-1].std_out[0:10*1024]
 
         cmd = Command(c)
-        out, err = cmd.run(data, timeout, kill_timeout, env)
+        out, err = cmd.run(data, timeout, kill_timeout, env, cwd)
 
         r = Response(process=cmd)
 
@@ -216,7 +223,7 @@ def run(command, data=None, timeout=None, kill_timeout=None, env=None):
     return r
 
 
-def connect(command, data=None, env=None):
+def connect(command, data=None, env=None, cwd=None):
     """Spawns a new process from the given command."""
 
     # TODO: support piped commands
@@ -232,6 +239,7 @@ def connect(command, data=None, env=None):
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         bufsize=0,
+        cwd=cwd,
     )
 
     return ConnectedCommand(process=process)
