@@ -30,17 +30,20 @@ def _terminate_process(process):
     else:
         os.kill(process.pid, signal.SIGTERM)
 
+
 def _kill_process(process):
-   if sys.platform == 'win32':
-       _terminate_process(process)
-   else:
-       os.kill(process.pid, signal.SIGKILL)
+    if sys.platform == 'win32':
+        _terminate_process(process)
+    else:
+        os.kill(process.pid, signal.SIGKILL)
+
 
 def _is_alive(thread):
     if hasattr(thread, "is_alive"):
         return thread.is_alive()
     else:
         return thread.isAlive()
+
 
 class Command(object):
     def __init__(self, cmd):
@@ -73,13 +76,13 @@ class Command(object):
 
                 if sys.version_info[0] >= 3:
                     self.out, self.err = self.process.communicate(
-                        input = bytes(self.data, "UTF-8") if self.data else None 
+                        input = bytes(self.data, "UTF-8") if self.data else None
                     )
                 else:
                     self.out, self.err = self.process.communicate(self.data)
             except Exception as exc:
                 self.exc = exc
-              
+
 
         thread = threading.Thread(target=target)
         thread.start()
@@ -206,14 +209,19 @@ def run(command, data=None, timeout=None, kill_timeout=None, env=None, cwd=None)
             data = history[-1].std_out[0:10*1024]
 
         cmd = Command(c)
-        out, err = cmd.run(data, timeout, kill_timeout, env, cwd)
+        try:
+            out, err = cmd.run(data, timeout, kill_timeout, env, cwd)
+            status_code = cmd.returncode
+        except OSError as e:
+            out, err = '', e.strerror
+            status_code = 127
 
         r = Response(process=cmd)
 
         r.command = c
         r.std_out = out
         r.std_err = err
-        r.status_code = cmd.returncode
+        r.status_code = status_code
 
         history.append(r)
 
