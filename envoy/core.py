@@ -16,7 +16,7 @@ import threading
 import traceback
 
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 __license__ = 'MIT'
 __author__ = 'Kenneth Reitz'
 
