@@ -1,7 +1,7 @@
 Envoy: Python Subprocesses for Humans.
 ======================================
 
-**Note:** Work in progress.
+**Note:** `Delegator <https://github.com/kennethreitz/delegator.py>`_ is a replacement for Envoy.
 
 This is a convenience wrapper around the `subprocess` module.
 
